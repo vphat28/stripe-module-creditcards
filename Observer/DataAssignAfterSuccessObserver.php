@@ -92,8 +92,6 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
         }
 
         if ($order->getData('stripe_uncaptured')) {
-            $order->setStatus(Order::STATE_PENDING_PAYMENT);
-            $order->setState(Order::STATE_PENDING_PAYMENT);
             $order->setData('stripe_uncaptured');
         }
 
@@ -102,8 +100,6 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
             $source = $this->sourceFactory->create();
             $source->setData('source_id', $order->getData('stripe_source_id'));
             $source->setData('reference_order_id', $order->getId());
-            $order->setState(Order::STATE_PENDING_PAYMENT);
-            $order->setStatus(Order::STATE_PENDING_PAYMENT);
             $payment->setAmountAuthorized(0);
             $comments = $order->getAllStatusHistory();
 
