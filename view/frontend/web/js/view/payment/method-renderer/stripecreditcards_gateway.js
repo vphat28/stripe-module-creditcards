@@ -316,7 +316,7 @@ define(
                 fullscreenLoader.startLoader();
                 if (!this.isValidate()) {
                     self.messageContainer.addErrorMessage({message: "Form key not validate. Please refresh the page and try again"});
-                    loader.stopLoader();
+                    fullscreenLoader.stopLoader();
                 } else {
                     var requestObject = {
                         owner: {
