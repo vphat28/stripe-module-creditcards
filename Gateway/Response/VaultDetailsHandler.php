@@ -110,19 +110,35 @@ class VaultDetailsHandler implements HandlerInterface
 
         $brand = '';
         $last4 = '';
+        $cardM = '';
+        $cardY = '';
 
-        if (isset($source['card']['brand'])) {
-            $brand = $source['card']['brand'];
-            $last4 = $source['card']['last4'];
+        if (isset($source['three_d_secure'])) {
+            if (isset($source['three_d_secure']['brand'])) {
+                $brand = $source['three_d_secure']['brand'];
+                $last4 = $source['three_d_secure']['last4'];
+                $cardM = $source['three_d_secure']['exp_month'];
+                $cardY = $source['three_d_secure']['exp_year'];
+            }
+        } else {
+            if (isset($source['card']['brand'])) {
+                $brand = $source['card']['brand'];
+                $last4 = $source['card']['last4'];
+                $cardM = $source['card']['exp_month'];
+                $cardY = $source['card']['exp_year'];
+            }
+            if (isset($source['brand'])) {
+                $brand = $source['brand'];
+                $last4 = $source['last4'];
+                $cardM = $source['exp_month'];
+                $cardY = $source['exp_year'];
+            }
         }
-        if (isset($source['brand'])) {
-            $brand = $source['brand'];
-            $last4 = $source['last4'];
-        }
+
         $json = array_merge($json, [
             'type' => $this->convertCardBrandtoCode($brand),
             'maskedCC' => $last4,
-            'expirationDate' => $source['card']['exp_month'] . '/' . $source['card']['exp_year']
+            'expirationDate' => $cardM . '/' . $cardY
         ]);
 
         $paymentToken->setTokenDetails($this->convertDetailsToJSON($json));

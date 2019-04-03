@@ -2,12 +2,14 @@
 
 namespace Stripeofficial\CreditCards\Observer;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Store\Model\ScopeInterface;
 use Stripeofficial\Core\Api\PaymentInterface;
 use Stripeofficial\Core\Model\ResourceModel\Source as SourceRS;
 use Stripeofficial\Core\Model\SourceFactory;
@@ -45,22 +47,17 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
      */
     protected $eventManager;
 
-    /**
-     * DataAssignAfterSuccessObserver constructor.
-     * @param PaymentInterface $creditCardPayment
-     * @param OrderRepositoryInterface $orderRepository
-     * @param SourceRS $sourceRs
-     * @param SourceFactory $sourceFactory
-     * @param OrderStatusHistoryRepositoryInterface $historyRepository
-     * @param ManagerInterface $eventManager
-     */
+    /** @var ScopeConfigInterface */
+    private $scopeConfig;
+
     public function __construct(
         PaymentInterface $creditCardPayment,
         OrderRepositoryInterface $orderRepository,
         SourceRS $sourceRs,
         SourceFactory $sourceFactory,
         OrderStatusHistoryRepositoryInterface $historyRepository,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->creditCardPayment = $creditCardPayment;
         $this->orderRepository = $orderRepository;
@@ -68,6 +65,7 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
         $this->sourceRs = $sourceRs;
         $this->historyRepository = $historyRepository;
         $this->eventManager = $eventManager;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -105,6 +103,13 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
             }
 
             $this->sourceRs->save($source);
+        }
+
+        $action = $this->scopeConfig->getValue('payment/stripecreditcards/payment_action', ScopeInterface::SCOPE_STORE, $order->getStoreId());
+
+        if ($action === 'authorize') {
+            $order->setState('new');
+            $order->setStatus('pending');
         }
 
         $this->orderRepository->save($order);

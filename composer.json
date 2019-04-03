@@ -2,7 +2,7 @@
     "name": "stripeofficial/module-creditcards",
     "description": "Stripe Credit Card payment method integration",
     "type": "magento2-module",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
