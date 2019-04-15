@@ -80,7 +80,7 @@ class ClientMock implements ClientInterface
     {
         $body = $transferObject->getBody();
 
-        if ($body['CURRENCY_CODE'] == 'jpy') {
+        if (isset($body['CURRENCY_CODE']) && $body['CURRENCY_CODE'] == 'jpy') {
             $body['AMOUNT'] = $body['AMOUNT'] / 100;
         }
 
