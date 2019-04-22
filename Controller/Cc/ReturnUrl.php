@@ -86,6 +86,14 @@ class ReturnUrl extends Action
         $this->checkoutSession = $checkoutSession;
         $this->orderRepository = $orderRepository;
         $this->cart = $cart;
+
+        if (interface_exists("\Magento\Framework\App\CsrfAwareActionInterface")) {
+            $request = $this->getRequest();
+            if ($request instanceof Http && $request->isPost() && empty($request->getParam('form_key'))) {
+                $formKey = $this->_objectManager->get(\Magento\Framework\Data\Form\FormKey::class);
+                $request->setParam('form_key', $formKey->getFormKey());
+            }
+        }
     }
 
     /**
