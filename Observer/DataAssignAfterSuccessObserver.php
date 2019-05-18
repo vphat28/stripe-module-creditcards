@@ -14,6 +14,7 @@ use Stripeofficial\Core\Api\PaymentInterface;
 use Stripeofficial\Core\Model\ResourceModel\Source as SourceRS;
 use Stripeofficial\Core\Model\SourceFactory;
 use Stripeofficial\CreditCards\Gateway\Config\Config;
+use Stripeofficial\CreditCards\Model\Adapter;
 
 class DataAssignAfterSuccessObserver implements ObserverInterface
 {
@@ -50,6 +51,9 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
     /** @var ScopeConfigInterface */
     private $scopeConfig;
 
+    /** @var Adapter */
+    private $adapter;
+
     public function __construct(
         PaymentInterface $creditCardPayment,
         OrderRepositoryInterface $orderRepository,
@@ -57,7 +61,8 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
         SourceFactory $sourceFactory,
         OrderStatusHistoryRepositoryInterface $historyRepository,
         ManagerInterface $eventManager,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        Adapter $adapter
     ) {
         $this->creditCardPayment = $creditCardPayment;
         $this->orderRepository = $orderRepository;
@@ -66,6 +71,7 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
         $this->historyRepository = $historyRepository;
         $this->eventManager = $eventManager;
         $this->scopeConfig = $scopeConfig;
+        $this->adapter = $adapter;
     }
 
     /**
@@ -105,7 +111,7 @@ class DataAssignAfterSuccessObserver implements ObserverInterface
             $this->sourceRs->save($source);
         }
 
-        $action = $this->scopeConfig->getValue('payment/stripecreditcards/payment_action', ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $action = $this->adapter->getConfigPaymentAction();
 
         if ($action === 'authorize') {
             $order->setState('new');

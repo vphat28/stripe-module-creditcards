@@ -5,6 +5,7 @@ namespace Stripeofficial\CreditCards\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
+use Stripeofficial\Core\Model\Cron\Webhook;
 use Stripeofficial\Core\Model\ResourceModel\Charge as ChargeResource;
 use Stripeofficial\Core\Model\ChargeFactory;
 
@@ -20,15 +21,17 @@ class DataAssignAfterCharge implements ObserverInterface
      */
     protected $chargeFactory;
 
-    /**
-     * DataAssignAfterCharge constructor.
-     * @param ChargeResource $chargeResource
-     * @param ChargeFactory $chargeFactory
-     */
-    public function __construct(ChargeResource $chargeResource, ChargeFactory $chargeFactory)
-    {
+    /** @var Webhook */
+    private $webhook;
+
+    public function __construct(
+        ChargeResource $chargeResource,
+        ChargeFactory $chargeFactory,
+        Webhook $webhook
+    ) {
         $this->chargeResource = $chargeResource;
         $this->chargeFactory = $chargeFactory;
+        $this->webhook = $webhook;
     }
 
     /**
@@ -41,6 +44,8 @@ class DataAssignAfterCharge implements ObserverInterface
         /** @var Order $order */
         $order = $observer->getData('order');
         $chargeId = $observer->getData('charge_id');
+
+        $this->webhook->createInvoice($order->getPayment(), $chargeId, $order);
 
         // Saving charge to database
         $charge = $this->chargeFactory->create();

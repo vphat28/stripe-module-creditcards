@@ -15,7 +15,7 @@
                 <field id="enable_3ds" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enforce 3D Secure</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                     <config_path>payment/stripecreditcards/enable_3ds</config_path>
+                    <config_path>payment/stripecreditcards/enable_3ds</config_path>
                     <comment>Always enforce 3D Secure when card supports it. If no, then only use 3D Secure for cards that require it.</comment>
                 </field>
                 <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
