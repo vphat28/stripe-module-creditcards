@@ -43,6 +43,7 @@ class RefundRequest implements BuilderInterface
             'TXN_ID' => $transactionId,
             'CURRENCY_CODE' => isset($paymentAdditionalInformation['currencyCode']) ? $paymentAdditionalInformation['currencyCode'] : $order->getCurrencyCode(),
             'REFUND_AMOUNT' => $amount,
+            'store_id' => $order->getStoreId(),
         ];
     }
 }

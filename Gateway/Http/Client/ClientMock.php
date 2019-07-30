@@ -8,6 +8,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Stripeofficial\Core\Helper\Data;
+use Stripeofficial\Core\Model\DataProvider;
 use Stripeofficial\Core\Model\Logger;
 use Stripeofficial\Core\Api\PaymentInterface;
 use Stripeofficial\CreditCards\Gateway\Config\Config;
@@ -46,6 +47,10 @@ class ClientMock implements ClientInterface
      * @var Data
      */
     protected $data;
+    /**
+     * @var DataProvider
+     */
+    private $dataProvider;
 
     /**
      * ClientMock constructor.
@@ -60,13 +65,15 @@ class ClientMock implements ClientInterface
         Config $config,
         CustomerRepositoryInterface $customerRepository,
         UrlInterface $urlBuilder,
-        Data $data
+        Data $data,
+        DataProvider $dataProvider
     ) {
         $this->creditCardPayment = $creditCardPayment;
         $this->config = $config;
         $this->customerRepository = $customerRepository;
         $this->urlBuilder = $urlBuilder;
         $this->data = $data;
+        $this->dataProvider = $dataProvider;
     }
 
     /**
@@ -79,6 +86,10 @@ class ClientMock implements ClientInterface
     public function placeRequest(TransferInterface $transferObject)
     {
         $body = $transferObject->getBody();
+
+        if (isset($body['store_id'])) {
+            $this->dataProvider->setCurrentStoreId($body['store_id']);
+        }
 
         if (isset($body['CURRENCY_CODE']) && $body['CURRENCY_CODE'] == 'jpy') {
             $body['AMOUNT'] = $body['AMOUNT'] / 100;
