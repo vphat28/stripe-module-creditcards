@@ -55,7 +55,7 @@ class Info extends ConfigurableInfo
     {
         $info = parent::getSpecificInformation();
 
-        if ($this->getIsSecureMode()) {
+        if (!$this->getIsSecureMode()) {
             /** @var Payment $payment */
             $payment = $this->getInfo();
 
